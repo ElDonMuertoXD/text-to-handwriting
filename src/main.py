@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import os
 import uuid
 import shutil
+import zipfile
 from typing import Optional
 
 from gemini import GeminiAI
@@ -45,7 +46,7 @@ async def generate_assignment(request: AssignmentRequest):
         ai = GeminiAI(api_key=request.gemini_api_key)
         
         # Generate assignment content using AI
-        full_text = ai.generate_assignment_content(
+        full_text = ai.generate_complete_assignment(
             name=request.name,
             class_roll=request.class_roll,
             university_roll=request.university_roll,
