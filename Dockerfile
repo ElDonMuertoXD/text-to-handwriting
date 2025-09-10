@@ -38,16 +38,13 @@ RUN pip install uv
 COPY . .
 
 # Install Python dependencies using uv
-RUN uv venv && \
-    . .venv/bin/activate && \
-    uv add pillow pytesseract reportlab fpdf2
+RUN uv sync
 
 # Create output directory
 RUN mkdir -p /app/output
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV PATH="/app/.venv/bin:$PATH"
 ENV DISPLAY=:99
 
 # Create a startup script with proper X11 auth
@@ -62,5 +59,8 @@ exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Command to run the application
-CMD ["python", "src/main.py"]
+# Expose the FastAPI port
+EXPOSE 8000
+
+# Command to run the FastAPI application
+CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

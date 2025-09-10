@@ -1,12 +1,18 @@
 [project]
 name = "text-to-handwriting"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.11"
+version = "1.0.0"
+description = "Convert text to handwriting using AI"
 dependencies = [
-    "pillow>=11.3.0",
-    "pytesseract>=0.3.13",
-    "reportlab>=4.4.3",
-    "fpdf2>=2.7.4",
+    "pillow>=10.0.1",
+    "pytesseract>=0.3.10",
+    "reportlab>=4.0.4",
+    "fpdf2>=2.7.6",
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "google-generativeai>=0.3.2",
+    "python-multipart>=0.0.6",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
