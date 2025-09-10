@@ -5,6 +5,7 @@ services:
     volumes:
       - ./output:/app/output
       - ./src:/app/src
+      - ./fonts:/app/fonts
     environment:
       - PYTHONPATH=/app
     stdin_open: true

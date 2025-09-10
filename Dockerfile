@@ -40,7 +40,7 @@ COPY . .
 # Install Python dependencies using uv
 RUN uv venv && \
     . .venv/bin/activate && \
-    uv add pywhatkit pillow pytesseract reportlab fpdf2
+    uv add pillow pytesseract reportlab fpdf2
 
 # Create output directory
 RUN mkdir -p /app/output
