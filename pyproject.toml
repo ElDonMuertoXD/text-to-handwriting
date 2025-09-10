@@ -1,0 +1,13 @@
+[project]
+name = "text-to-handwriting"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pillow>=11.3.0",
+    "pytesseract>=0.3.13",
+    " pip install pywhatkit==4.6",
+    "reportlab>=4.4.3",
+    "fpdf2>=2.7.4",
+]
