@@ -91,5 +91,4 @@ text-to-handwriting/
 Contributions are welcome:
 
 - Pwease star the repo first 😭
-- feel free to use this repo however you want this isn't under any license
 - feel free to add some good fonts under the fonts directory, if you can convert your handwriting to a font it is highly appreciated.
