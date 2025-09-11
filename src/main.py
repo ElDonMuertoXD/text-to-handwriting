@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import uuid
@@ -12,6 +13,14 @@ from handwriting_generator import text_to_handwriting_pillow
 from pdf_converter import convert_image_to_pdf
 
 app = FastAPI(title="Text to Handwriting API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class AssignmentRequest(BaseModel):
     name: str
