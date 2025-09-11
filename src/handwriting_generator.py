@@ -274,8 +274,8 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
     
     # Add more handwriting-style fonts here
     handwriting_fonts = [
-        os.path.join(project_root, "fonts", "RumorsSkill.ttf"),
-        # os.path.join(project_root, "fonts", "english_essay.ttf"),
+        # os.path.join(project_root, "fonts", "RumorsSkill.ttf"),
+        os.path.join(project_root, "fonts", "english_essay.ttf"),
     ]
     
     # Improved parameters for more natural handwriting - A4 size proportions
