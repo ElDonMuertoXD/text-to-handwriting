@@ -2,7 +2,7 @@ from fpdf import FPDF
 import os
 from PIL import Image
 
-def compress_image(image_path, quality=30, max_dimension=1200):
+def compress_image(image_path, quality=75, max_dimension=1600):
     """
     Compress image by reducing quality and dimensions
     """
@@ -38,8 +38,8 @@ def convert_image_to_pdf(image_path, pdf_path=None, additional_images=None):
     compressed_files = []
     
     try:
-        # Compress first image
-        compressed_main = compress_image(image_path, quality=25, max_dimension=1000)
+        # Compress first image - improved quality settings
+        compressed_main = compress_image(image_path, quality=80, max_dimension=1600)
         compressed_files.append(compressed_main)
         
         # Add first page
@@ -57,8 +57,8 @@ def convert_image_to_pdf(image_path, pdf_path=None, additional_images=None):
                 img.save(temp_path)
                 compressed_files.append(temp_path)
                 
-                # Compress the temporary image
-                compressed_temp = compress_image(temp_path, quality=25, max_dimension=1000)
+                # Compress the temporary image - improved quality
+                compressed_temp = compress_image(temp_path, quality=80, max_dimension=1600)
                 compressed_files.append(compressed_temp)
                 
                 pdf.add_page()
@@ -76,5 +76,5 @@ def convert_image_to_pdf(image_path, pdf_path=None, additional_images=None):
             except Exception as e:
                 print(f"Warning: Could not remove temporary file {file_path}: {e}")
     
-    print(f"Compressed PDF saved as: {pdf_path}")
+    print(f"PDF saved as: {pdf_path}")
     return pdf_path
