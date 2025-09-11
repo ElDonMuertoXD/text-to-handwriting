@@ -4,7 +4,6 @@ from pydantic import BaseModel
 import os
 import uuid
 import shutil
-import zipfile
 from typing import Optional
 
 from gemini import GeminiAI
@@ -22,7 +21,7 @@ class AssignmentRequest(BaseModel):
     subject_code: str
     question_topic: str
     output_filename: str
-    gemini_api_key: str  # New required field
+    gemini_api_key: str
     other_details: Optional[str] = None
 
 @app.get("/")
@@ -42,10 +41,7 @@ async def generate_assignment(request: AssignmentRequest):
     output_dir = None
     
     try:
-        # Initialize Gemini AI with provided API key
         ai = GeminiAI(api_key=request.gemini_api_key)
-        
-        # Generate assignment content using AI
         full_text = ai.generate_complete_assignment(
             name=request.name,
             class_roll=request.class_roll,
@@ -55,11 +51,7 @@ async def generate_assignment(request: AssignmentRequest):
             question_topic=request.question_topic,
             other_details=request.other_details
         )
-        
-        # Process the text
         processed_text = process_text(full_text)
-        
-        # Create unique output directory for this request
         unique_id = str(uuid.uuid4())
         output_dir = os.path.join("output", unique_id)
         os.makedirs(output_dir, exist_ok=True)
@@ -68,8 +60,6 @@ async def generate_assignment(request: AssignmentRequest):
         image_filename = f"{request.output_filename}.png"
         image_path = os.path.join(output_dir, image_filename)
         result = text_to_handwriting_pillow(processed_text, image_path)
-        
-        # Handle single or multiple pages
         if isinstance(result, tuple):
             image_path, additional_images = result
         else:
@@ -99,7 +89,6 @@ async def generate_assignment(request: AssignmentRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Clean up on error
         if output_dir and os.path.exists(output_dir):
             try:
                 shutil.rmtree(output_dir)

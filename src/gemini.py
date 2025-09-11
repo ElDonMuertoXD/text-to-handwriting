@@ -4,25 +4,23 @@ from typing import Optional
 
 class GeminiAI:
     def __init__(self, api_key: Optional[str] = None):
-        # Use provided API key or fall back to environment variable
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY must be provided either as parameter or environment variable")
         
         genai.configure(api_key=self.api_key)
         
-        # Enhanced system instruction for plain text output with specific formatting
-        system_instruction = """You are an assistant that writes plain text responses only for handwritten assignments. 
-
-MANDATORY FORMATTING RULES:
-- NEVER use markdown formatting like *, **, _, __, #, ```, or any other special characters for formatting
-- Write as if you are handwriting on paper - use only regular text
-- When you want to create a line break or spacing, use /LINE_BREAK
-- Separate paragraphs naturally with double line breaks
-- Start writing the assignment content immediately without any introductory phrases
-- Do NOT write "Answer:" or any similar prefixes - just start with the content
-- Write in a natural, student-like tone suitable for handwritten assignments
-- Use proper paragraph structure with clear topic sentences"""
+        system_instruction = """
+        You are an assistant that writes plain text responses only for handwritten assignments.
+        MANDATORY FORMATTING RULES:
+        - NEVER use markdown formatting like *, **, _, __, #, ```, or any other special characters for formatting
+        - Write as if you are handwriting on paper - use only regular text
+        - When you want to create a line break or spacing, use /LINE_BREAK
+        - Separate paragraphs naturally with double line breaks
+        - Start writing the assignment content immediately without any introductory phrases
+        - Do NOT write "Answer:" or any similar prefixes - just start with the content
+        - Write in a natural, student-like tone suitable for handwritten assignments
+        - Use proper paragraph structure with clear topic sentences"""
         
         self.model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_instruction)
     
@@ -39,7 +37,6 @@ MANDATORY FORMATTING RULES:
         """
         Generate the header section with proper formatting for handwritten assignments
         """
-        # Create header information with line breaks after each line
         header_lines = [
             f"Name: {name}",
             f"Class Roll: {class_roll}", 
@@ -47,14 +44,12 @@ MANDATORY FORMATTING RULES:
             f"Subject: {subject_name}",
             f"Subject Code: {subject_code}"
         ]
-        
-        # Join header lines with /LINE_BREAK for proper handwriting formatting
+
         header_info = "/LINE_BREAK".join(header_lines)
         
         if other_details:
             header_info += f"/LINE_BREAK/LINE_BREAK{other_details}"
         
-        # Add topic section with proper spacing
         header_info += f"/LINE_BREAK/LINE_BREAK/LINE_BREAKTopic: {question_topic}/LINE_BREAK/LINE_BREAK"
         
         return header_info
@@ -67,37 +62,35 @@ MANDATORY FORMATTING RULES:
         """
         Generate only the assignment answer content (no header information)
         """
-        # Enhanced prompt focused only on content generation
         prompt = f"""Write a detailed assignment answer for the topic: {question_topic}
+                CRITICAL FORMATTING RULES:
+                - Use ONLY plain text - absolutely NO markdown syntax
+                - NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
+                - NO special formatting characters whatsoever
+                - Write exactly as if you are writing with a pen on paper
+                - Use /LINE_BREAK only when you need to force a specific line break
+                - Separate paragraphs naturally with double line breaks
+                - Write in simple, clear sentences
+                - Do NOT start with "Answer:" or any prefix - just begin writing the content
+                - Do NOT include any header information like name, roll numbers, subject details
 
-CRITICAL FORMATTING RULES:
-- Use ONLY plain text - absolutely NO markdown syntax
-- NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
-- NO special formatting characters whatsoever
-- Write exactly as if you are writing with a pen on paper
-- Use /LINE_BREAK only when you need to force a specific line break
-- Separate paragraphs naturally with double line breaks
-- Write in simple, clear sentences
-- Do NOT start with "Answer:" or any prefix - just begin writing the content
-- Do NOT include any header information like name, roll numbers, subject details
+                Write a comprehensive university-level assignment answer for "{subject_name}" that includes:
+                - A clear introduction to the topic
+                - Main body with relevant points and examples  
+                - A proper conclusion
+                - Approximately 400-600 words
+                - Academic but student-friendly tone
+                - Demonstrate good understanding of the subject
 
-Write a comprehensive university-level assignment answer for "{subject_name}" that includes:
-- A clear introduction to the topic
-- Main body with relevant points and examples  
-- A proper conclusion
-- Approximately 400-600 words
-- Academic but student-friendly tone
-- Demonstrate good understanding of the subject
+                Start writing the assignment content immediately without any prefixes or headers.
 
-Start writing the assignment content immediately without any prefixes or headers.
-
-Topic: {question_topic}"""
+                Topic: {question_topic}"""
         
         try:
             response = self.model.generate_content(prompt)
             generated_content = response.text
             
-            # Clean up any remaining markdown syntax that might slip through
+            # we are only interested in plain text
             generated_content = self._clean_markdown(generated_content)
             
             return generated_content
@@ -118,12 +111,10 @@ Topic: {question_topic}"""
         """
         Generate complete assignment with header and content
         """
-        # Generate header section
         header_section = self.generate_header_section(
             name, class_roll, university_roll, subject_name, subject_code, question_topic, other_details
         )
         
-        # Generate only the content
         content = self.generate_assignment_content(subject_name, question_topic)
         
         # Combine header and content

@@ -4,23 +4,17 @@ import os
 import numpy as np
 import cv2
 
+# ts adds a sublte yellow tint and noise to simulate paper texture
 def add_paper_texture(image):
     """Add realistic paper texture to the image"""
     width, height = image.size
-    
-    # Create paper texture using noise
     noise = np.random.normal(0, 8, (height, width, 3))
-    
-    # Convert PIL image to numpy array
     img_array = np.array(image)
-    
-    # Add subtle paper texture
     textured = img_array.astype(np.float32) + noise
     textured = np.clip(textured, 0, 255).astype(np.uint8)
     
     # Create slight color variation for aged paper effect
-    # Add subtle yellow/beige tint
-    tint = np.ones_like(textured) * [252, 248, 240]  # Slight off-white
+    tint = np.ones_like(textured) * [252, 248, 240]
     textured = (textured * 0.95 + tint * 0.05).astype(np.uint8)
     
     return Image.fromarray(textured)
@@ -51,10 +45,9 @@ def draw_pencil_margins(draw, width, height, margin_left, margin_top):
             else:  # Horizontal line
                 texture_color = (color[0] + 5, color[1] + 5, color[2] + 5)  # Reduced texture variation
                 draw.line([start_x, start_y + offset, end_x, end_y + offset], fill=texture_color, width=1)
-    
-    # Gray/slate pencil color with 50% reduced opacity
-    # Original: (80, 85, 90) -> 50% lighter: (168, 170, 173)
-    pencil_color = (168, 170, 173)  # 50% lighter gray/slate color
+
+    # Gray/slate pencil color
+    pencil_color = (168, 170, 173)
     
     # Vertical left margin line - spans full height of page
     start_y = 0  # Start from very top
@@ -76,14 +69,14 @@ def draw_pencil_margins(draw, width, height, margin_left, margin_top):
                  fill=pencil_color)
     
     # Add some margin dots/marks (like notebook paper) - positioned after the lines
-    dot_color = (185, 188, 190)  # Even lighter gray for dots (50% reduced opacity)
+    dot_color = (185, 188, 190) 
     for i in range(3):
         y_pos = margin_top + 10 + i * 15  # No random variation
         x_pos = margin_left - 35  # Positioned between margin line and text
         draw.ellipse([x_pos-1, y_pos-1, x_pos+1, y_pos+1], fill=dot_color)
     
     # Optional: Add some small tick marks along the margins for notebook-like appearance
-    tick_color = (200, 202, 205)  # Even lighter gray for ticks (50% reduced opacity)
+    tick_color = (200, 202, 205)
     
     # Small ticks along the vertical margin
     for i in range(3, int((height - margin_top - 50) / 120)):
@@ -107,7 +100,7 @@ def add_ink_bleeding_effect(image, text_color=(0, 0, 0)):
     
     # Create a slightly larger version for bleeding effect
     bleeding_img = image.copy()
-    bleeding_img = bleeding_img.filter(ImageFilter.GaussianBlur(radius=0.3))
+    bleeding_img = bleeding_img.filter(ImageFilter.GaussianBlur(radius=0.5))
     
     # Blend original with bleeding version
     blended = Image.blend(image, bleeding_img, 0.15)
@@ -123,6 +116,7 @@ def apply_phone_scan_distortion(image):
     src_points = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
     
     # Define destination points (slightly skewed for phone scan effect)
+    # Basically trying to make it so that it is narrower on the top and wider on the bottom
     top_offset = random.randint(5, 15)
     bottom_offset = random.randint(-3, 3)
     side_skew = random.randint(-5, 5)
@@ -142,15 +136,12 @@ def apply_phone_scan_distortion(image):
 
 def add_realistic_lighting(image):
     """Add subtle lighting effects as if photographed with phone"""
-    # Add slight brightness variation across the image
-    enhancer = ImageEnhance.Brightness(image)
-    
     # Create a gradient overlay for lighting effect
     width, height = image.size
     gradient = Image.new('L', (width, height), 255)
-    draw = ImageDraw.Draw(gradient)
     
     # Create subtle radial gradient (brighter in center, darker at edges)
+    # so it looks like the picture has been clicked from phone
     center_x, center_y = width // 2, height // 2
     max_radius = min(width, height) // 2
     
