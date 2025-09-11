@@ -1,6 +1,191 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 import random
 import os
+import numpy as np
+import cv2
+
+def add_paper_texture(image):
+    """Add realistic paper texture to the image"""
+    width, height = image.size
+    
+    # Create paper texture using noise
+    noise = np.random.normal(0, 8, (height, width, 3))
+    
+    # Convert PIL image to numpy array
+    img_array = np.array(image)
+    
+    # Add subtle paper texture
+    textured = img_array.astype(np.float32) + noise
+    textured = np.clip(textured, 0, 255).astype(np.uint8)
+    
+    # Create slight color variation for aged paper effect
+    # Add subtle yellow/beige tint
+    tint = np.ones_like(textured) * [252, 248, 240]  # Slight off-white
+    textured = (textured * 0.95 + tint * 0.05).astype(np.uint8)
+    
+    return Image.fromarray(textured)
+
+def draw_pencil_margins(draw, width, height, margin_left, margin_top):
+    """Draw realistic hand-drawn pencil margins using straight lines"""
+    
+    def draw_straight_pencil_line(start_x, start_y, end_x, end_y, color=(100, 100, 120)):
+        """Draw a straight pencil line with very slight natural tilt"""
+        # Add very subtle tilt variation (much smaller than hand-drawn)
+        if start_x == end_x:  # Vertical line
+            # Very slight horizontal drift for vertical lines
+            tilt_variation = random.uniform(-0.5, 0.5)  # Very small tilt
+            end_x += tilt_variation
+        else:  # Horizontal line  
+            # Very slight vertical drift for horizontal lines
+            tilt_variation = random.uniform(-0.5, 0.5)  # Very small tilt
+            end_y += tilt_variation
+        
+        # Draw main line
+        draw.line([start_x, start_y, end_x, end_y], fill=color, width=1)
+        
+        # Add slight pencil texture by drawing parallel lines with slight opacity variation
+        for offset in [-0.5, 0.5]:
+            if abs(start_x - end_x) < 1:  # Vertical line (accounting for slight tilt)
+                texture_color = (color[0] + 5, color[1] + 5, color[2] + 5)  # Reduced texture variation
+                draw.line([start_x + offset, start_y, end_x + offset, end_y], fill=texture_color, width=1)
+            else:  # Horizontal line
+                texture_color = (color[0] + 5, color[1] + 5, color[2] + 5)  # Reduced texture variation
+                draw.line([start_x, start_y + offset, end_x, end_y + offset], fill=texture_color, width=1)
+    
+    # Gray/slate pencil color with 50% reduced opacity
+    # Original: (80, 85, 90) -> 50% lighter: (168, 170, 173)
+    pencil_color = (168, 170, 173)  # 50% lighter gray/slate color
+    
+    # Vertical left margin line - spans full height of page
+    start_y = 0  # Start from very top
+    end_y = height  # End at very bottom
+    margin_x = margin_left - 25  # Position for margin line
+    draw_straight_pencil_line(margin_x, start_y, margin_x, end_y, pencil_color)
+    
+    # Horizontal top margin line - spans full width of page
+    start_x = 0  # Start from very left edge
+    end_x = width  # End at very right edge
+    margin_y = margin_top - 25  # Position for margin line
+    draw_straight_pencil_line(start_x, margin_y, end_x, margin_y, pencil_color)
+    
+    # Add intersection reinforcement where lines meet (also with reduced opacity)
+    intersection_x = margin_x
+    intersection_y = margin_y
+    # Draw a small circle at intersection to make it look more realistic
+    draw.ellipse([intersection_x-1, intersection_y-1, intersection_x+1, intersection_y+1], 
+                 fill=pencil_color)
+    
+    # Add some margin dots/marks (like notebook paper) - positioned after the lines
+    dot_color = (185, 188, 190)  # Even lighter gray for dots (50% reduced opacity)
+    for i in range(3):
+        y_pos = margin_top + 10 + i * 15  # No random variation
+        x_pos = margin_left - 35  # Positioned between margin line and text
+        draw.ellipse([x_pos-1, y_pos-1, x_pos+1, y_pos+1], fill=dot_color)
+    
+    # Optional: Add some small tick marks along the margins for notebook-like appearance
+    tick_color = (200, 202, 205)  # Even lighter gray for ticks (50% reduced opacity)
+    
+    # Small ticks along the vertical margin
+    for i in range(3, int((height - margin_top - 50) / 120)):
+        tick_y = margin_top + i * 120  # No random variation
+        tick_x = margin_x
+        draw.line([tick_x-3, tick_y, tick_x+3, tick_y], fill=tick_color, width=1)
+    
+    # Small ticks along the horizontal margin
+    for i in range(2, int((width - margin_left - 100) / 180)):
+        tick_x = margin_left + i * 180  # No random variation
+        tick_y = margin_y
+        draw.line([tick_x, tick_y-3, tick_x, tick_y+3], fill=tick_color, width=1)
+
+def add_ink_bleeding_effect(image, text_color=(0, 0, 0)):
+    """Add subtle ink bleeding effect to text"""
+    # Convert to numpy array
+    img_array = np.array(image)
+    
+    # Find text pixels (non-white pixels)
+    text_mask = np.any(img_array < 250, axis=2)
+    
+    # Create a slightly larger version for bleeding effect
+    bleeding_img = image.copy()
+    bleeding_img = bleeding_img.filter(ImageFilter.GaussianBlur(radius=0.3))
+    
+    # Blend original with bleeding version
+    blended = Image.blend(image, bleeding_img, 0.15)
+    
+    return blended
+
+def apply_phone_scan_distortion(image):
+    """Apply realistic phone scan perspective distortion"""
+    img_array = np.array(image)
+    h, w = img_array.shape[:2]
+    
+    # Define source points (perfect rectangle)
+    src_points = np.float32([[0, 0], [w, 0], [w, h], [0, h]])
+    
+    # Define destination points (slightly skewed for phone scan effect)
+    top_offset = random.randint(5, 15)
+    bottom_offset = random.randint(-3, 3)
+    side_skew = random.randint(-5, 5)
+    
+    dst_points = np.float32([
+        [top_offset, random.randint(-5, 5)],
+        [w - top_offset + side_skew, random.randint(-5, 5)],
+        [w + bottom_offset, h + random.randint(-5, 5)],
+        [bottom_offset - side_skew, h + random.randint(-5, 5)]
+    ])
+    
+    # Apply perspective transform
+    matrix = cv2.getPerspectiveTransform(src_points, dst_points)
+    warped = cv2.warpPerspective(img_array, matrix, (w, h), borderValue=(255, 255, 255))
+    
+    return Image.fromarray(warped)
+
+def add_realistic_lighting(image):
+    """Add subtle lighting effects as if photographed with phone"""
+    # Add slight brightness variation across the image
+    enhancer = ImageEnhance.Brightness(image)
+    
+    # Create a gradient overlay for lighting effect
+    width, height = image.size
+    gradient = Image.new('L', (width, height), 255)
+    draw = ImageDraw.Draw(gradient)
+    
+    # Create subtle radial gradient (brighter in center, darker at edges)
+    center_x, center_y = width // 2, height // 2
+    max_radius = min(width, height) // 2
+    
+    for y in range(height):
+        for x in range(width):
+            distance = ((x - center_x)**2 + (y - center_y)**2)**0.5
+            brightness = max(240, 255 - int((distance / max_radius) * 15))
+            gradient.putpixel((x, y), brightness)
+    
+    # Apply gradient as overlay
+    gradient_rgb = gradient.convert('RGB')
+    result = Image.blend(image, gradient_rgb, 0.05)
+    
+    return result
+
+def add_scan_noise(image):
+    """Add realistic scanning noise and compression artifacts"""
+    # Add subtle noise
+    width, height = image.size
+    noise_array = np.random.normal(0, 2, (height, width, 3))
+    
+    img_array = np.array(image).astype(np.float32)
+    noisy = img_array + noise_array
+    noisy = np.clip(noisy, 0, 255).astype(np.uint8)
+    
+    result = Image.fromarray(noisy)
+    
+    # Simulate slight JPEG compression
+    import io
+    buffer = io.BytesIO()
+    result.save(buffer, format='JPEG', quality=92)  # Slight compression
+    buffer.seek(0)
+    result = Image.open(buffer)
+    
+    return result
 
 def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -8,20 +193,17 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
     
     # Add more handwriting-style fonts here
     handwriting_fonts = [
-        # os.path.join(project_root, "fonts", "QEDonaldRoss.ttf"),
-        # os.path.join(project_root, "fonts", "QEHerbertCooper.ttf"),
-        os.path.join(project_root, "fonts", "RumorsSkill.ttf"),
-        # os.path.join(project_root, "fonts", "english_essay.ttf"),
-        # os.path.join(project_root, "fonts", "QEMamasAndPapas.ttf") #ts kinda bad
+        # os.path.join(project_root, "fonts", "RumorsSkill.ttf"),
+        os.path.join(project_root, "fonts", "english_essay.ttf"),
     ]
     
     # Improved parameters for more natural handwriting - A4 size proportions
     font_size = 40       # Larger, more readable handwriting size
-    line_height = font_size + 15  # More natural line spacing
-    margin_left = 80     # Left margin
-    margin_top = 70     # Top margin
+    line_height = font_size + 20  # More natural line spacing
+    margin_left = 100    # Increased left margin to account for pencil margin
+    margin_top = 90      # Increased top margin to account for pencil margin
     margin_right = 80    # Right margin
-    margin_bottom = 10  # Bottom margin
+    margin_bottom = 10   # Bottom margin
     page_width = 1240    # A4-like width
     page_height = 1754   # A4-like height
     
@@ -106,8 +288,16 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
     
     # Generate pages
     for page_num in range(total_pages):
-        img = Image.new('RGB', (page_width, page_height), color='white')
+        # Start with off-white background for realistic paper color
+        img = Image.new('RGB', (page_width, page_height), color=(254, 252, 248))
+        
+        # Add paper texture first
+        img = add_paper_texture(img)
+        
         draw = ImageDraw.Draw(img)
+        
+        # Draw pencil margins
+        draw_pencil_margins(draw, page_width, page_height, margin_left, margin_top)
         
         y_offset = margin_top
         start_line = page_num * lines_per_page
@@ -118,21 +308,55 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
                 break
                 
             line = all_lines[i]
-            
             if line.strip():
                 # Add subtle horizontal and vertical variation for natural handwriting look
-                x_offset = margin_left + random.randint(-3, 3)
-                current_y = y_offset + random.randint(-2, 2)
+                base_x_offset = margin_left + random.randint(-3, 3)
+                base_y_offset = y_offset + random.randint(-2, 2)
                 
-                draw.text((x_offset, current_y), line, fill='black', font=font)
+                # Add very subtle line tilt (simulate natural hand movement)
+                # Calculate line tilt - very small angle variation
+                line_tilt_angle = random.uniform(-0.5, 0.5)  # degrees, very subtle
+                line_length = len(line) * (font_size * 0.6)  # approximate line width
+                
+                # For very subtle effect, we'll render character by character with slight vertical drift
+                current_x = base_x_offset
+                words = line.split(' ')
+                
+                for word_idx, word in enumerate(words):
+                    if word_idx > 0:  # Add space between words
+                        word = ' ' + word
+                    
+                    # Calculate slight vertical drift based on line tilt
+                    char_progress = current_x / max(line_length, 1)  # 0 to 1 progress across line
+                    tilt_offset = char_progress * line_length * (line_tilt_angle * 0.017453)  # Convert degrees to radians
+                    
+                    # Add character-level variation for more natural look
+                    char_x = current_x + random.uniform(-0.5, 0.5)
+                    char_y = base_y_offset + tilt_offset + random.uniform(-0.3, 0.3)
+                    
+                    # Use slightly varied dark blue/black for ink
+                    ink_color = (random.randint(15, 25), random.randint(15, 25), random.randint(40, 60))
+                    draw.text((char_x, char_y), word, fill=ink_color, font=font)
+                    
+                    # Calculate width of this word to move cursor
+                    word_bbox = temp_draw.textbbox((0, 0), word, font=font)
+                    word_width = word_bbox[2] - word_bbox[0]
+                    current_x += word_width
+                
                 y_offset += line_height
             else:
-                # Empty line - add spacing for paragraph separation (like original code)
+                # Empty line - add spacing for paragraph separation
                 y_offset += line_height // 2
             
             # Break if we're getting close to bottom margin
             if y_offset > page_height - margin_bottom:
                 break
+        
+        # Apply post-processing effects for realism
+        img = add_ink_bleeding_effect(img)
+        img = apply_phone_scan_distortion(img)
+        img = add_realistic_lighting(img)
+        img = add_scan_noise(img)
         
         images.append(img)
     

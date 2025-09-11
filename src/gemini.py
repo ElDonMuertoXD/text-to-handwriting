@@ -55,7 +55,7 @@ MANDATORY FORMATTING RULES:
             header_info += f"/LINE_BREAK/LINE_BREAK{other_details}"
         
         # Add topic section with proper spacing
-        header_info += f"/LINE_BREAK/LINE_BREAK/LINE_BREAKTOPIC: {question_topic}/LINE_BREAK/LINE_BREAK"
+        header_info += f"/LINE_BREAK/LINE_BREAK/LINE_BREAKTopic: {question_topic}/LINE_BREAK/LINE_BREAK"
         
         return header_info
     
