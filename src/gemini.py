@@ -1,6 +1,6 @@
 import google.generativeai as genai
 import os
-from typing import Optional
+from typing import Optional, List
 
 class GeminiAI:
     def __init__(self, api_key: Optional[str] = None):
@@ -31,7 +31,7 @@ class GeminiAI:
         university_roll: str,
         subject_name: str,
         subject_code: str,
-        question_topic: str,
+        topics: List[str],
         other_details: Optional[str] = None
     ) -> str:
         """
@@ -50,42 +50,81 @@ class GeminiAI:
         if other_details:
             header_info += f"/LINE_BREAK/LINE_BREAK{other_details}"
         
-        header_info += f"/LINE_BREAK/LINE_BREAKTopic: {question_topic}/LINE_BREAK/LINE_BREAK"
+        # Add topics section
+        if len(topics) == 1:
+            header_info += f"/LINE_BREAK/LINE_BREAKTopic: {topics[0]}/LINE_BREAK/LINE_BREAK"
+        else:
+            header_info += "/LINE_BREAK/LINE_BREAK"
         
         return header_info
     
     def generate_assignment_content(
         self,
         subject_name: str,
-        question_topic: str
+        topics: List[str]
     ) -> str:
         """
-        Generate only the assignment answer content (no header information)
+        Generate assignment content for multiple topics/questions
         """
-        prompt = f"""Write a detailed assignment answer for the topic: {question_topic}
-                CRITICAL FORMATTING RULES:
-                - Use ONLY plain text - absolutely NO markdown syntax
-                - NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
-                - NO special formatting characters whatsoever
-                - Write exactly as if you are writing with a pen on paper
-                - Use /LINE_BREAK /LINE_BREAK only when you need to force a specific line break
-                - Make sure the text has structured paragraphs with line breaks as mentioned, do not generate a single block of text
-                - Separate paragraphs naturally with double line breaks
-                - Write in simple, clear sentences
-                - Do NOT start with "Answer:" or any prefix - just begin writing the content
-                - Do NOT include any header information like name, roll numbers, subject details
+        if len(topics) == 1:
+            # Single topic - existing behavior
+            prompt = f"""Write a detailed assignment answer for the topic: {topics[0]}
+                    CRITICAL FORMATTING RULES:
+                    - Use ONLY plain text - absolutely NO markdown syntax
+                    - NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
+                    - NO special formatting characters whatsoever
+                    - Write exactly as if you are writing with a pen on paper
+                    - Use /LINE_BREAK /LINE_BREAK only when you need to force a specific line break
+                    - Make sure the text has structured paragraphs with line breaks as mentioned, do not generate a single block of text
+                    - Separate paragraphs naturally with double line breaks
+                    - Write in simple, clear sentences
+                    - Do NOT start with "Answer:" or any prefix - just begin writing the content
+                    - Do NOT include any header information like name, roll numbers, subject details
 
-                Write a comprehensive university-level assignment answer for "{subject_name}" that includes:
-                - A clear introduction to the topic
-                - Main body with relevant points and examples  
-                - A proper conclusion
-                - Approximately 400-600 words
-                - Academic but student-friendly tone
-                - Demonstrate good understanding of the subject
+                    Write a comprehensive university-level assignment answer for "{subject_name}" that includes:
+                    - A clear introduction to the topic
+                    - Main body with relevant points and examples  
+                    - A proper conclusion
+                    - Approximately 400-600 words
+                    - Academic but student-friendly tone
+                    - Demonstrate good understanding of the subject
 
-                Start writing the assignment content immediately without any prefixes or headers.
+                    Start writing the assignment content immediately without any prefixes or headers.
 
-                Topic: {question_topic}"""
+                    Topic: {topics[0]}"""
+        else:
+            # Multiple topics
+            topics_list = "\n".join([f"{i+1}. {topic}" for i, topic in enumerate(topics)])
+            prompt = f"""Write detailed assignment answers for multiple topics/questions in "{subject_name}".
+                    
+                    CRITICAL FORMATTING RULES:
+                    - Use ONLY plain text - absolutely NO markdown syntax
+                    - NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
+                    - NO special formatting characters whatsoever
+                    - Write exactly as if you are writing with a pen on paper
+                    - Use /LINE_BREAK /LINE_BREAK only when you need to force a specific line break
+                    - Separate each question/topic clearly
+                    - Write in simple, clear sentences
+                    - Do NOT start with "Answer:" or any prefix
+                    - Do NOT include any header information like name, roll numbers, subject details
+                    
+                    FORMAT FOR EACH TOPIC:
+                    Topic/Question(Determin based on the text, write either Topic or Question not Both) [NUMBER]: [TOPIC TEXT]
+                    /LINE_BREAK /LINE_BREAK
+                    [Your detailed answer here with proper paragraphs]
+                    /LINE_BREAK /LINE_BREAK
+                    
+                    Write comprehensive university-level answers that include:
+                    - Clear explanations for each topic
+                    - Relevant examples and details
+                    - Proper academic tone but student-friendly
+                    - Each answer should be 200-400 words
+                    - Demonstrate good understanding of the subject
+                    
+                    Topics to answer:
+                    {topics_list}
+                    
+                    Start writing immediately with the first topic."""
         
         try:
             response = self.model.generate_content(prompt)
@@ -106,17 +145,17 @@ class GeminiAI:
         university_roll: str,
         subject_name: str,
         subject_code: str,
-        question_topic: str,
+        topics: List[str],
         other_details: Optional[str] = None
     ) -> str:
         """
-        Generate complete assignment with header and content
+        Generate complete assignment with header and content for multiple topics
         """
         header_section = self.generate_header_section(
-            name, class_roll, university_roll, subject_name, subject_code, question_topic, other_details
+            name, class_roll, university_roll, subject_name, subject_code, topics, other_details
         )
         
-        content = self.generate_assignment_content(subject_name, question_topic)
+        content = self.generate_assignment_content(subject_name, topics)
         
         # Combine header and content
         full_text = header_section + content

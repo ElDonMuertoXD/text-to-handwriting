@@ -277,7 +277,7 @@ def render_character_with_variations(draw, char, position, font, base_color, var
     
     return char_width
 
-def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
+def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png", handwriting_id: int = None):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
     
@@ -291,13 +291,12 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
         {
             'path': os.path.join(project_root, "fonts", "RumorsSkill.ttf"),
             'config_name': 'rumors_skill',
-            id: 2
+            'id': 2
         },
         {
             'path': os.path.join(project_root, "fonts", "Brushy Handwriting - Demo.otf"),
             'config_name': 'brushy_handwriting',
             'id': 3
-
         },
         {
             'path': os.path.join(project_root, "fonts", "March Frost.ttf"),
@@ -322,15 +321,29 @@ def text_to_handwriting_pillow(text: str, output_path: str = "handwriting.png"):
     if not available_fonts:
         raise FileNotFoundError("No handwriting fonts found in the fonts directory")
     
-    # Randomly select a font
-    selected_font_info = random.choice(available_fonts)
+    # Select font based on handwriting_id or random selection
+    if handwriting_id is not None:
+        # Find font by ID
+        selected_font_info = None
+        for font in available_fonts:
+            if font['id'] == handwriting_id:
+                selected_font_info = font
+                break
+        
+        if selected_font_info is None:
+            available_ids = [font['id'] for font in available_fonts]
+            raise ValueError(f"Handwriting ID {handwriting_id} not found. Available IDs: {available_ids}")
+    else:
+        # Randomly select a font (fallback behavior)
+        selected_font_info = random.choice(available_fonts)
+    
     font_path = selected_font_info['path']
     font_name = selected_font_info['config_name']
     
     # Get configuration for the selected font
     config = get_font_config(font_name)
     
-    print(f"Using font: {font_path} with config: {font_name}")
+    print(f"Using font: {font_path} with config: {font_name} (ID: {selected_font_info['id']})")
     
     # Use configuration parameters
     font_size = config.font_size

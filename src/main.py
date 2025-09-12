@@ -1,18 +1,27 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import uuid
 import shutil
-from typing import Optional
+from typing import Optional, List
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from gemini import GeminiAI
 from text_processor import process_text
 from handwriting_generator import text_to_handwriting_pillow
 from pdf_converter import convert_image_to_pdf
 
+# Create limiter instance
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="Text to Handwriting API", version="1.0.0")
+
+# Add the limiter to the app
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,9 +37,10 @@ class AssignmentRequest(BaseModel):
     university_roll: str
     subject_name: str
     subject_code: str
-    question_topic: str
+    topics: List[str]  # Changed from question_topic to topics as a list
     output_filename: str
     gemini_api_key: str
+    handwriting_id: int  # Added handwriting selection (1-6)
     other_details: Optional[str] = None
 
 @app.get("/")
@@ -38,7 +48,8 @@ async def root():
     return {"message": "Text to Handwriting API is running"}
 
 @app.post("/generate-assignment")
-async def generate_assignment(request: AssignmentRequest):
+@limiter.limit("5/minute")  # Allow 1 request per minute per IP
+async def generate_assignment(request: Request, assignment_request: AssignmentRequest):
     """
     Single route that:
     1. Uses Gemini AI to generate assignment content
@@ -50,25 +61,29 @@ async def generate_assignment(request: AssignmentRequest):
     output_dir = None
     
     try:
-        ai = GeminiAI(api_key=request.gemini_api_key)
+        # Validate handwriting_id
+        if not (1 <= assignment_request.handwriting_id <= 6):
+            raise ValueError("handwriting_id must be between 1 and 6")
+        
+        ai = GeminiAI(api_key=assignment_request.gemini_api_key)
         full_text = ai.generate_complete_assignment(
-            name=request.name,
-            class_roll=request.class_roll,
-            university_roll=request.university_roll,
-            subject_name=request.subject_name,
-            subject_code=request.subject_code,
-            question_topic=request.question_topic,
-            other_details=request.other_details
+            name=assignment_request.name,
+            class_roll=assignment_request.class_roll,
+            university_roll=assignment_request.university_roll,
+            subject_name=assignment_request.subject_name,
+            subject_code=assignment_request.subject_code,
+            topics=assignment_request.topics,  # Changed from question_topic to topics
+            other_details=assignment_request.other_details
         )
         processed_text = process_text(full_text)
         unique_id = str(uuid.uuid4())
         output_dir = os.path.join("output", unique_id)
         os.makedirs(output_dir, exist_ok=True)
         
-        # Generate handwritten image(s)
-        image_filename = f"{request.output_filename}.png"
+        # Generate handwritten image(s) with selected handwriting
+        image_filename = f"{assignment_request.output_filename}.png"
         image_path = os.path.join(output_dir, image_filename)
-        result = text_to_handwriting_pillow(processed_text, image_path)
+        result = text_to_handwriting_pillow(processed_text, image_path, assignment_request.handwriting_id)
         if isinstance(result, tuple):
             image_path, additional_images = result
         else:
@@ -76,7 +91,7 @@ async def generate_assignment(request: AssignmentRequest):
             additional_images = None
         
         # Convert to PDF
-        pdf_filename = f"{request.output_filename}.pdf"
+        pdf_filename = f"{assignment_request.output_filename}.pdf"
         pdf_path = os.path.join(output_dir, pdf_filename)
         convert_image_to_pdf(image_path, pdf_path, additional_images)
         
