@@ -50,7 +50,7 @@ class GeminiAI:
         if other_details:
             header_info += f"/LINE_BREAK/LINE_BREAK{other_details}"
         
-        header_info += f"/LINE_BREAK/LINE_BREAK/LINE_BREAKTopic: {question_topic}/LINE_BREAK/LINE_BREAK"
+        header_info += f"/LINE_BREAK/LINE_BREAKTopic: {question_topic}/LINE_BREAK/LINE_BREAK"
         
         return header_info
     
@@ -68,7 +68,8 @@ class GeminiAI:
                 - NO asterisks (*), NO hashtags (#), NO underscores (_), NO backticks (`)
                 - NO special formatting characters whatsoever
                 - Write exactly as if you are writing with a pen on paper
-                - Use /LINE_BREAK only when you need to force a specific line break
+                - Use /LINE_BREAK /LINE_BREAK only when you need to force a specific line break
+                - Make sure the text has structured paragraphs with line breaks as mentioned, do not generate a single block of text
                 - Separate paragraphs naturally with double line breaks
                 - Write in simple, clear sentences
                 - Do NOT start with "Answer:" or any prefix - just begin writing the content
