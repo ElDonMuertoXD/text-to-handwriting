@@ -1,4 +1,4 @@
-# F\*ck handwritten assignments 😡
+# We hate handwritten assignments 😡
 
 Transform your typed text into realistic handwritten documents instantly! This project generates authentic-looking handwritten assignments with pencil margins, paper texture, and natural writing variations.
 
